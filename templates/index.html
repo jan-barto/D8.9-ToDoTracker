@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+    <div class="row">
+        <h4>Současné úkoly</h4>
+
+        {% for item in data %}
+        {%if item.status != 'Completed'%}
+
+        <div class="card mx-4 my-2 col-12">
+            <div class="card-body p-1">
+                <div class="row p-0">
+                    <div class="col-3">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Termín: {{ item.due_date }} </h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Vznik: {{ item.created }} </h6>
+                    </div>
+                    <div class="col-7">
+                        <p class="card-text pt-1"><b><i>{{item.text}}</i></b></p>
+                        <a href="{{url_for('edit', id=item.id)}}" class="card-link">Upravit</a>
+                        <a href="{{url_for('done', id=item.id)}}" class="card-link">Splněno</a>
+                        <a href="{{url_for('delete', id=item.id)}}" class="card-link">Smazat</a>
+                    </div>
+                    <div class="col-2">
+                        {% if item.due_date > today %}
+                        {% set pic = 'in_time' %}
+                        {% set to_show = 'On Time' %}
+                        {% elif item.due_date == today %}
+                        {% set pic = 'still_today' %}
+                        {% set to_show = 'Due Date today' %}
+                        {% else %}
+                        {% set pic = 'over_time' %}
+                        {% set to_show = 'Overdue' %}
+                        {% endif %}
+
+                        <img src="../static/{{ pic }}.png" alt="{{ pic }}">
+                        <p class="card-text"><small class="text-body-secondary">{{to_show}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<div class="container py-2">
+    <h4 class="py-4">
+        <button class="btn btn-primary" onclick="toggleVisibility('section1')">+</button>
+        Přidat nový úkol
+    </h4>
+
+    <div id="section1" class="hidden">
+
+        <div class="row col-4">
+
+            {% from 'bootstrap5/form.html' import render_form %}
+            {{ form.csrf_token }}
+            {{ render_form(form, novalidate=True) }}
+        </div>
+    </div>
+
+    <div>
+        <h5 class="py-2">
+            <button class="btn btn-primary" onclick="toggleVisibility('section2')">+</button>
+            Ukázat splněné úkoly
+        </h5>
+        <div id="section2" class="hidden">
+
+            {% for item in data %}
+            {%if item.status == 'Completed'%}
+
+            <div class="card mx-4 my-2 col-5">
+                <div class="card-body">
+                    <div class="row p-0">
+                        <div class="col-10">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">*{{ item.created }} -> T:{{ item.due_date }} </h6>
+                            <p class="card-text py-3"><b><i>{{item.text}}</i></b></p>
+                            <p class="card-text"><small class="text-body-secondary">{{item.status}}</small></p>
+                            <a href="{{url_for('edit', id=item.id)}}" class="card-link">Upravit</a>
+
+                            <a href="{{url_for('delete', id=item.id)}}" class="card-link">Smazat</a>
+                        </div>
+                        <div class="col-2">
+                            <p>Done</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <script>
+            function toggleVisibility(elementId) {
+                var element = document.getElementById(elementId);
+                if (element.classList.contains('hidden')) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            }
+        </script>
+
+    </div>
+</div>
+
+{% endblock %}

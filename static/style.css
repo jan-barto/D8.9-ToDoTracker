@@ -1,0 +1,15 @@
+.hidden {
+display: none;
+}
+
+header, footer {
+background-color: #0d6efd;
+color: white;
+padding: 15px;
+text-align: left;
+}
+
+img{
+width: 50px;
+}
+
